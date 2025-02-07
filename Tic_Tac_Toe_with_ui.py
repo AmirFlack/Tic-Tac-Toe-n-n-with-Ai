@@ -1,9 +1,11 @@
+#امیرحسین پودراتچی
+#سینا رضقیان
 import math
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 
 def create_board(size):
-    return [[' ' for _ in range(size)] for _ in range(size)]
+    return [[' ' for i in range(size)] for i in range(size)]
 
 def board_is_full(board): #if board is full it returns true if not it returns false and the game continues
     return all(cell != ' ' for row in board for cell in row)
@@ -17,7 +19,7 @@ def count_streak(board, x, y, dx, dy, player): #counts streaks in a given direct
         y += dy
     return count
 
-def evaluate_board(board):
+def evaluate_board(board): #for calculating the score of every given board either it's ai or the player
     ai_score = 0
     human_score = 0
     size = len(board)
@@ -45,6 +47,7 @@ def get_empty_squares(board): #returns a list of all available moves
             if board[i][j] == ' ':
                 available_moves.append((i, j))
     return available_moves
+
 def minimax(board, depth, alpha, beta, maximizing, memory):  
     #alpha is the best value maximizing player can get and beta for the minimizing player
     #maximizing is True if AI is playing and False if human is playing
@@ -84,6 +87,7 @@ def best_move(board):
     memory = {}
     empty_count = len(get_empty_squares(board))
     min_depth, max_depth = 0, 0
+    #a method for making ai smarter the thurther you go
     if empty_count <= 16: min_depth, max_depth = 4, 6
     elif empty_count <= 24: min_depth, max_depth = 3, 5
     elif empty_count <= 60: min_depth, max_depth = 2, 5
@@ -103,6 +107,7 @@ def best_move(board):
 class tic_tac_toe_game: #game ui class
     def __init__(self, root):
         self.root = root
+        #a dialog that user gets to enter a amount for the board's size
         self.size = simpledialog.askinteger("Board Size", "Enter board size:", minvalue=3)
         if not self.size:
             self.root.destroy()
@@ -132,7 +137,7 @@ class tic_tac_toe_game: #game ui class
             label = tk.Label(self.root, text=self.column_labels[j], font=('Arial', 16), width=3, height=1)
             label.grid(row=0, column=j + 1)  #putting column labels in the first row
     
-    def human_move(self, row, col):
+    def human_move(self, row, col):#this is a function for writing and caching human move
         if self.board[row][col] == ' ' and self.human_turn:
             self.board[row][col] = 'X'
             self.buttons[row][col].config(text='X', state=tk.DISABLED)
@@ -141,7 +146,7 @@ class tic_tac_toe_game: #game ui class
             self.check_status()
             self.root.after(500, self.ai_move)
     
-    def ai_move(self):
+    def ai_move(self): #this just a function to use best_move function for ai and show it for the user
         if not self.human_turn and not board_is_full(self.board):
             import datetime
             clock = datetime.datetime.now()
@@ -156,7 +161,7 @@ class tic_tac_toe_game: #game ui class
             self.human_turn = True
             self.check_status()
     
-    def check_status(self):
+    def check_status(self): #it checks that if the board is full it's gonna show the scores and who has won
         if board_is_full(self.board):
             human_score, ai_score = evaluate_board(self.board)[1], evaluate_board(self.board)[2]
             result = f"Final Scores:\nYou: {human_score}\nAI: {ai_score}\n"
